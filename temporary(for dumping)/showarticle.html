@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--my own scripts-->
+	<script src="scripts.js"></script>
+
+</head>
+<body>
+
+<div class="container">
+	<form id="form1" class="form-inline" action="http://edwinchua.tech/Articles/listposts.php" method="get">
+		<div class="form-group" >
+			<label for="articleid">Article ID:</label>
+			<input name="articleid" type="title" class="form-control " id="articleid" placeholder="Enter id (Compulsory)">
+			<span class="help-block">This is some help text that breaks onto a new line and may extend more than one line.</span>
+		</div>
+
+		<input type="submit" class="btn btn-primary" value = "Search"/>
+	</form>	
+	<div id="pageDiv"></div>
+		<ul id="pageUl" class="pagination"></ul>
+	<div id = "resultnum"></div>
+	<div id = "result"></div>
+</div>
+
+
+
+</body>
+
+<script type="text/javascript">
+var data1;
+var pageCount;
+var resultsPerPage = 20;
+var currentPage =1;
+
+var form = $('#form1');
+form.submit(function (event) 
+{
+	event.preventDefault();
+    $.ajax
+    ({
+        type: form.attr('method'),
+        url: form.attr('action'),
+        data: form.serialize(),
+        dataType: "json",
+        success: function (data) 
+        {
+        	document.getElementById('resultnum').innerHTML= data.length + " results found";
+        	CalculatePageNumber(data);
+        	data1 = data;
+        	ShowPage(1);
+		}	            
+    });
+});
+
+function CalculatePageNumber(data)
+{
+	var pageCount=1;
+	var x = data.length;
+	var y = Math.ceil(x/resultsPerPage);
+
+	var toAdd = document.createDocumentFragment();
+	var i;
+	document.getElementById('pageUl').innerHTML='';
+	for (i = 0; i < y; i++)
+	{
+		var newPageTab = document.createElement('li');
+		newPageTab.id = "pageTab"+ pageCount;
+		newPageTab.innerHTML = '<a href=# onclick="ShowPage('+pageCount+')">' + pageCount +'</a>';
+		toAdd.appendChild(newPageTab);
+		pageCount++;
+	}
+	document.getElementById('pageUl').appendChild(toAdd);
+}
+
+function ShowPage(page)
+{
+	var x = (page - 1) * resultsPerPage;
+	var toAdd = document.createDocumentFragment();
+	var i;
+	//console.log(document.getElementById('pageTab' + page));
+	document.getElementById('result').innerHTML='';
+	for (i = x; i <= x+(resultsPerPage-1); i++)
+	{
+		try
+		{
+			var title = data1[i].Title;
+			var id = data1[i].ArticleID;
+			var newDiv = document.createElement('div');
+			newDiv.id = 'r'+i;
+			newDiv.className = "well well-sm";
+			newDiv.innerHTML = id + " " + title;
+			toAdd.appendChild(newDiv);	
+		}
+		catch (TypeError)
+		{
+			break;
+		}
+	}
+	document.getElementById('result').appendChild(toAdd);
+
+	SetActivePage(page, currentPage);
+	currentPage = page;
+}
+
+function SetActivePage(active, inactive)
+{
+	document.getElementById('pageTab' + inactive).className="";
+	document.getElementById('pageTab' + active).className="active";
+}
+
+
+</script>
+</html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--my own scripts-->
+	<script src="scripts.js"></script>
+
+</head>
+<body>
+
+<div id="header"></div>
+
+<button type="button" class="btn btn-primary btn-lg" style="border-radius: 50% ; position:fixed; box-shadow: 3px 3px 3px 	grey; left: 80%; top: 80%">+</button>
+
+<div class="container">
+	<form id="form1" action="php/listposts.php" method="get">
+		<div class="form-group" >
+			<label for="articleid">Article ID:</label>
+			<input name="articleid" type="title" class="form-control " id="articleid" placeholder="Enter id (Compulsory)">
+			<span class="help-block">This is some help text that breaks onto a new line and may extend more than one line.</span>
+			<label for="text">Text:</label>
+			<input name="text" type="title" class="form-control " id="text" placeholder="Enter some text">
+			<span class="help-block">This is some help text that breaks onto a new line and may extend more than one line.</span>
+			<input name="searchtype" style="visibility: hidden;" id="searchtype" value="searchall">
+		</div>
+		<!--<div class="dropdown">
+			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Results Per Page
+			<span class="caret"></span></button>
+			<ul class="dropdown-menu">
+				<li><a href="#" value="10">10</a></li>
+				<li><a href="#" value="20">20</a></li>
+				<li><a href="#" value="50">50</a></li>
+			</ul>
+		</div>-->
+		<input type="submit" class="btn btn-primary" value = "Search"/>
+	</form>	
+	<div id="pageDiv"></div>
+	<center>
+		<ul id="pageUl" class="pagination"></ul>
+	</center>
+
+	<div id = "resultnum"></div>
+	<div id = "result"></div>
+	
+	<center>
+		<ul id="pageUl2" class="pagination"></ul>
+	</center>
+</div>
+
+</body>
+
+<script>
+$(function(){
+  $("#header").load("resources/header.html"); 
+  $("#footer").load("resources/footer.html"); 
+});
+
+var data1;
+var pageCount;
+var resultsPerPage = 20;
+var currentPage =1;
+
+var form = $('#form1');
+form.submit(function (event) 
+{
+	document.getElementById('resultnum').innerHTML="";
+	document.getElementById('pageUl').innerHTML='';
+	document.getElementById('pageUl2').innerHTML='';
+	document.getElementById('result').innerHTML='';
+	event.preventDefault();
+    $.ajax
+    ({
+        type: form.attr('method'),
+        url: form.attr('action'),
+        data: form.serialize(),
+        dataType: "json",
+        success: function (data) 
+        {
+        	document.getElementById('resultnum').innerHTML= data.length + " results found";
+        	CalculatePageNumber(data);
+        	data1 = data;
+        	ShowPage(1);
+		},
+		error: function (data)
+		{
+			document.getElementById('resultnum').innerHTML= "No results found";
+		}
+
+    });
+});
+
+function CalculatePageNumber(data)
+{
+	var pageCount=1;
+	var x = data.length;
+	var y = Math.ceil(x/resultsPerPage);
+
+	var toAdd = document.createDocumentFragment();
+	var i;
+	document.getElementById('pageUl').innerHTML='';
+	document.getElementById('pageUl2').innerHTML='';
+	for (i = 0; i < y; i++)
+	{
+		var newPageTab = document.createElement('li');
+		newPageTab.id = "pageTab"+ pageCount;
+		newPageTab.innerHTML = '<a href=# onclick="ShowPage('+pageCount+')">' + pageCount +'</a>';
+		toAdd.appendChild(newPageTab);
+		pageCount++;
+	}
+	document.getElementById('pageUl').appendChild(toAdd);
+	pageCount=1;
+	var toAdd2 = document.createDocumentFragment();
+	for (i = 0; i < y; i++)
+	{
+		var newPageTab = document.createElement('li');
+		newPageTab.id = "pageTab2"+ pageCount;
+		newPageTab.innerHTML = '<a href=# onclick="ShowPage('+pageCount+')">' + pageCount +'</a>';
+		toAdd2.appendChild(newPageTab);
+		pageCount++;
+	}
+	document.getElementById('pageUl2').appendChild(toAdd2);
+	
+}
+
+function ShowPage(page)
+{
+	var x = (page - 1) * resultsPerPage;
+	var toAdd = document.createDocumentFragment();
+	var i;
+	//console.log(document.getElementById('pageTab' + page));
+	document.getElementById('result').innerHTML='';
+	for (i = x; i <= x+(resultsPerPage-1); i++)
+	{
+		try
+		{
+			var title = data1[i].Title;
+			var id = data1[i].ArticleID;
+			var newDiv = document.createElement('div');
+			newDiv.id = 'r'+i;
+			newDiv.className = "well well-sm";
+			newDiv.innerHTML = "<a href=\"showarticle.html?articleid="+ id + "\"> <b>" + id + " " + title + "</b></a> <br /> ";
+			toAdd.appendChild(newDiv);	
+		}
+		catch (TypeError)
+		{
+			break;
+		}
+	}
+	document.getElementById('result').appendChild(toAdd);
+
+	SetActivePage(page, currentPage);
+	currentPage = page;
+}
+
+function SetActivePage(active, inactive)
+{
+	try
+	{
+	document.getElementById('pageTab' + inactive).className="";
+	document.getElementById('pageTab2' + inactive).className="";
+	}
+	catch (TypeError)
+	{
+
+	}
+	finally
+	{
+	document.getElementById('pageTab' + active).className="active";
+	document.getElementById('pageTab2' + active).className="active";
+	}
+}
+
+
+</script>
+</html>

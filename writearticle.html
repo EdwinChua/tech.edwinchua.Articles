@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--my own scripts-->
+	<script src="scripts.js"></script>
+
+</head>
+<body>
+<div id="header"></div>
+
+<div id="successAlert" class="alert alert-success alert-dismissible" style="visibility:hidden">
+  <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+  <strong>Success!</strong> Your article has been successfully added.
+</div>
+
+	<div class="container">
+		    	<form id="form1" action="php/addpost.php" method="post">
+					<div class="form-group" >
+						<label for="title">Title:</label>
+						<input name="title" type="title" class="form-control " id="title" placeholder="Enter title (Compulsory)" required>
+						<span class="help-block">This is some help text that breaks onto a new line and may extend more than one line.</span>
+					</div>
+					<div class="form-group">
+						<label for="name">Name:</label>
+						<input type="name" class="form-control" id="name">
+						<span class="help-block">This is some help text that breaks onto a new line and may extend more than one line.</span>
+					</div>
+					<div class="form-group">
+						<label for="article">Article:</label>
+						<textarea name="article" class="form-control" rows="5" id="article"></textarea>
+					</div>
+					<div class="form-group">
+						<label for="img1">Image 1:</label>
+						<input type="file" class="form-control" id="img1" accept="image/*">
+						<span class="help-block">This is some help text that breaks onto a new line and may extend more than one line.</span>
+					</div>
+					<input type="submit" class="btn btn-primary" value = "submit"/>
+				</form>	
+	</div>
+
+</body>
+
+<script>
+$(function(){
+  $("#header").load("resources/header.html"); 
+  $("#footer").load("resources/footer.html"); 
+});
+
+
+var form = $('#form1');
+form.submit(function (event) 
+{
+	event.preventDefault();
+
+    $.ajax
+    ({
+        type: form.attr('method'),
+        url: form.attr('action'),
+        data: form.serialize(),
+        success: function (data) 
+        {
+            document.getElementById('successAlert').style.visibility="visible";
+            window.setTimeout(function(){ window.location = "showarticle.html?articleid="+data; },3000);
+        }
+    });
+});
+</script>
+
+</html>

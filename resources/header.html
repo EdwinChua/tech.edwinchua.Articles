@@ -1,0 +1,48 @@
+<!--Navigation bar mobile responsive-->
+	<nav class="navbar navbar-inverse">
+	  <div class="container-fluid">
+	    <div class="navbar-header">	
+	      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span> 
+	      </button>
+	      <a class="navbar-brand" href="#">EC.T</a>
+	    </div>
+	    <div class="collapse navbar-collapse" id="myNavbar">
+	      <ul class="nav navbar-nav">
+	        <li id="navbarHome"><a href="index.html" onclick="SelectMenuItem(navbarHome)">Home</a></li>
+	        <li id="navbarWrite"><a href="writearticle.html" onclick="SelectMenuItem(navbarWrite)">Write</a></li>
+	        <li id="navbarSearch"><a href="searcharticles.html" onclick="SelectMenuItem(navbarSearch)">Search</a></li> 
+	        <li id="navbarBrowse"><a href="showarticle.html?articleid=1" onclick="SelectMenuItem(navbarBrowse)">Browse</a></li> 
+	      </ul>
+	      <ul class="nav navbar-nav navbar-right">
+	        <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+	        <li><a href="#" data-toggle="login" data-placement="auto" title="Login" style="max-width: 100%"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+	      </ul>
+	    </div>
+	  </div>
+	</nav>
+
+<script>
+
+var url = window.location.pathname
+if ( url == "/Articles/searcharticles.html")
+{
+		document.getElementById("navbarSearch").className="active";
+}
+if ( url == "/Articles/index.html")
+{
+		document.getElementById("navbarHome").className="active";
+}
+if ( url == "/Articles/writearticle.html")
+{
+		document.getElementById("navbarWrite").className="active";
+}
+if ( url == "/Articles/showarticle.html")
+{
+		document.getElementById("navbarBrowse").className="active";
+}
+
+
+</script>

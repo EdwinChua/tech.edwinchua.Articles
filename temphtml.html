@@ -1,0 +1,78 @@
+	@RequestMapping(value = {"/managestudent/{type}", "/managestudent"}, method = RequestMethod.GET)
+	public ModelAndView manageStudent(@PathVariable Map<String, String> pathVariablesMap, Locale locale, Model model, @RequestParam Map<String, String> requestParams , HttpServletRequest req)
+	{
+		try
+		{
+			String id = requestParams.get("id").toLowerCase();
+			ModelAndView mav = new ModelAndView("managestudent");
+			StudentDetail student = studentService.findStudentById(id);
+			
+			// retrieves list of courses student is enrolled in
+			ArrayList<Enrolment> enrolList = enrolmentService.findAllCoursesAttending();
+			List<Enrolment> enrolList2 = new ArrayList<Enrolment>();
+			for (Enrolment e : enrolList)
+			{
+				if (e.getStudentDetails().getStudentId().toLowerCase().contains(id))
+				{
+					enrolList2.add(e);
+				}
+			}
+
+			// lists all courses available for student to enrol in
+			ArrayList<Course> courseList = cseService.findAllCourses();
+			ArrayList<Course> courseListTemp = new ArrayList<Course>();
+			for (Course c : courseList)
+			{
+				if (c.getStatus().equals("Open"))
+				{
+					courseListTemp.add(c);
+				}
+			}
+			//removes courses student is already enrolled in
+			for (Enrolment e : enrolList2)
+			{
+				courseListTemp.remove(e.getCourses());
+			}
+
+			mav.addObject("courseavailable", courseListTemp);
+			mav.addObject("enroldata", enrolList2);
+			mav.addObject("data", student); //adds specific student detail to response
+			return mav;
+		} catch (Exception e) // catches requestParams.get("id") null pointer exception, lists all students
+		{
+///*			ModelAndView mav = new ModelAndView("managestudent");
+//			ArrayList<StudentDetail> lctList = studentService.findAllStudents();
+//			List<StudentDetail> tempList = new ArrayList<StudentDetail>();
+//			for (StudentDetail l : lctList)
+//			{
+//				if (l.getStatus().toLowerCase().contains("active"))
+//				{
+//					tempList.add(l);
+//				}
+//			}
+//
+//			mav.addObject("dataList", tempList);
+//			return mav;*/
+			
+			PagedListHolder<StudentDetail> studentList = null;
+
+			String type = pathVariablesMap.get("type");
+
+			if (null == type) {
+				// First Request, Return first set of list
+				List<StudentDetail> studentListOther = studentService.findAllStudents();
+				studentList = new PagedListHolder<StudentDetail>();
+				studentList.setSource(studentListOther);
+				studentList.setPageSize(10);
+				req.getSession().setAttribute("studentListPage", studentList);
+			} else {
+				// Return specific index set of list
+				studentList = (PagedListHolder<StudentDetail>) req.getSession().getAttribute("studentListPage");
+				int pageNum = Integer.parseInt(type);
+				studentList.setPage(pageNum);
+			}
+
+			ModelAndView mv = new ModelAndView("managestudent");
+			return mv;
+		}
+	}

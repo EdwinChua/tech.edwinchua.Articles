@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!--my own scripts-->
+	<script src="scripts.js"></script>
+</head>
+<body>
+<div id="header"></div>
+
+<button type="button" class="btn btn-primary btn-lg" style="border-radius: 50% ; position:fixed; box-shadow: 3px 3px 3px  grey; left: 80%; top: 80%">+</button>
+
+<div class="container">
+	<div id="forTitle" class="jumbotron"></div>
+	<div id="forDate" class="container"></div>
+	<div id="forAuthor" class="container"></div>
+	<div id="forContent" class="container"></div>
+
+</div>
+
+<div id="myModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Oops!</h4>
+      </div>
+      <div class="modal-body">
+        <p>We couldn't find the article you were looking for. You will be redirected in 3 seconds.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+
+<script type="text/javascript">
+$(function(){
+  $("#header").load("resources/header.html"); 
+  $("#footer").load("resources/footer.html"); 
+});
+
+
+var qs = (function(a) {
+    if (a == "") return {};
+    var b = {};
+    for (var i = 0; i < a.length; ++i)
+    {
+        var p=a[i].split('=', 2);
+        if (p.length == 1)
+            b[p[0]] = "";
+        else
+            b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+    }
+    return b;
+})(window.location.search.substr(1).split('&'));
+
+$.ajax
+    ({
+        type: 'get',
+        url: 'php/listposts.php?articleid='+qs["articleid"],
+        
+        dataType: "json",
+        success: function (data) 
+        {
+			document.getElementById('forTitle').innerHTML='<h2>' + data[0].Title + '</h2>';
+			document.getElementById('forDate').innerHTML='<h3> Posted on: ' + data[0].ArticlePostTimeStamp + '</h3>';
+			document.getElementById('forAuthor').innerHTML='<h4> Posted by: ' + data[0].Name + '</h4>';
+			strData = data[0].TextBody;
+			strData = strData.replace(/\r?\n|\r/g, "<br/>");
+			document.getElementById('forContent').innerHTML= strData;
+		},
+		error: function (data)
+		{
+			$('#myModal').modal('toggle');
+			window.setTimeout(function(){ window.location = "showarticle.html?articleid=1"; },3000);
+		}
+	});
+
+
+</script>
+
+</html>
